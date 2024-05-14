@@ -25,6 +25,6 @@ def download_youtube_video(url, video_only=False, preferred_resolution=None):
 
 if __name__ == "__main__":
     video_url = input("Enter the URL of the YouTube video: ")
-    video_only = input("Download video only? (y/n): ").lower() == 'y'
+    video_only = input("Download video? (y/n): ").lower() == 'y'
     preferred_resolution = input("Preferred video resolution (e.g., '720p', '1080p', '240p') or leave blank for highest available quality: ").lower()
     download_youtube_video(video_url, video_only, preferred_resolution)
