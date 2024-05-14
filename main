@@ -1,0 +1,24 @@
+import requests
+import os
+
+def download_video(url, output_dir='.'):
+    # Send a GET request to the URL
+    response = requests.get(url, stream=True)
+    if response.status_code == 200:
+        # Extract the filename from the URL
+        filename = url.split('/')[-1]
+        filepath = os.path.join(output_dir, filename)
+
+        # Open a file in binary write mode and write the video content to it
+        with open(filepath, 'wb') as f:
+            for chunk in response.iter_content(chunk_size=1024):
+                if chunk:
+                    f.write(chunk)
+        
+        print(f"Video downloaded successfully to: {filepath}")
+    else:
+        print("Failed to download video")
+
+if __name__ == "__main__":
+    video_url = input("Enter the URL of the video: ")
+    download_video(video_url)
