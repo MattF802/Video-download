@@ -1,24 +1,30 @@
-import requests
 import os
+from pytube import YouTube
 
-def download_video(url, output_dir='.'):
-    # Send a GET request to the URL
-    response = requests.get(url, stream=True)
-    if response.status_code == 200:
-        # Extract the filename from the URL
-        filename = url.split('/')[-1]
-        filepath = os.path.join(output_dir, filename)
-
-        # Open a file in binary write mode and write the video content to it
-        with open(filepath, 'wb') as f:
-            for chunk in response.iter_content(chunk_size=1024):
-                if chunk:
-                    f.write(chunk)
-        
+def download_youtube_video(url, video_only=False, preferred_resolution=None):
+    yt = YouTube(url)
+    
+    if video_only:
+        if preferred_resolution:
+            video = yt.streams.filter(res=preferred_resolution, progressive=True).first()
+        else:
+            video = yt.streams.filter(progressive=True).first()
+        downloads_dir = os.path.join(os.path.expanduser('~'), 'Downloads')
+        filepath = os.path.join(downloads_dir, video.default_filename)
+        video.download(output_path=downloads_dir, filename=video.default_filename)
         print(f"Video downloaded successfully to: {filepath}")
     else:
-        print("Failed to download video")
+        if preferred_resolution:
+            audio = yt.streams.filter(only_audio=True, file_extension='mp4', abr='128kbps').first()
+        else:
+            audio = yt.streams.filter(only_audio=True).first()
+        downloads_dir = os.path.join(os.path.expanduser('~'), 'Downloads')
+        filepath = os.path.join(downloads_dir, audio.default_filename)
+        audio.download(output_path=downloads_dir, filename=audio.default_filename)
+        print(f"Audio downloaded successfully to: {filepath}")
 
 if __name__ == "__main__":
-    video_url = input("Enter the URL of the video: ")
-    download_video(video_url)
+    video_url = input("Enter the URL of the YouTube video: ")
+    video_only = input("Download video only? (y/n): ").lower() == 'y'
+    preferred_resolution = input("Preferred video resolution (e.g., '720p', '1080p', '240p') or leave blank for highest available quality: ").lower()
+    download_youtube_video(video_url, video_only, preferred_resolution)
